@@ -49,6 +49,7 @@ def draw(canvas):
             try:
                 coroutine.send(None)
                 canvas.refresh()
+                canvas.border()
             except StopIteration:
                 coroutines.remove(coroutine)
             if not coroutines:
