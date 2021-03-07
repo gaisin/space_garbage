@@ -26,7 +26,7 @@ async def animate_spaceship(canvas, window_rows, window_columns, step_size):
         frames.common.draw_frame(canvas, start_row, start_column, current_frame)
 
         iteration += 1
-        await asyncio.sleep(0)
+        await sleep()
 
         frames.common.draw_frame(canvas, start_row, start_column, current_frame, negative=True)
 
@@ -47,20 +47,16 @@ async def blink(canvas, row, column, symbol='*'):
 
     while True:
         canvas.addstr(row, column, symbol, curses.A_DIM)
-        for _ in range(random.randint(10, 20)):
-          await asyncio.sleep(0)
+        await sleep(random.randint(10, 20))
 
         canvas.addstr(row, column, symbol)
-        for _ in range(random.randint(3, 6)):
-          await asyncio.sleep(0)
+        await sleep(random.randint(3, 6))
 
         canvas.addstr(row, column, symbol, curses.A_BOLD)
-        for _ in range(random.randint(5, 10)):
-          await asyncio.sleep(0)
+        await sleep(random.randint(5, 10))
 
         canvas.addstr(row, column, symbol)
-        for _ in range(random.randint(3, 6)):
-          await asyncio.sleep(0)
+        await sleep(random.randint(3, 6))
 
 
 async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0):
@@ -69,10 +65,10 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
     row, column = start_row, start_column
 
     canvas.addstr(round(row), round(column), '*')
-    await asyncio.sleep(0)
+    await sleep()
 
     canvas.addstr(round(row), round(column), 'O')
-    await asyncio.sleep(0)
+    await sleep()
     canvas.addstr(round(row), round(column), ' ')
 
     row += rows_speed
@@ -87,7 +83,7 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
 
     while 0 < row < max_row and 0 < column < max_column:
         canvas.addstr(round(row), round(column), symbol)
-        await asyncio.sleep(0)
+        await sleep()
         canvas.addstr(round(row), round(column), ' ')
         row += rows_speed
         column += columns_speed
@@ -119,6 +115,13 @@ async def fly_garbage(canvas, column, garbage_frame, speed=1):
 
     while row < rows_number:
         frames.common.draw_frame(canvas, row, column, garbage_frame)
-        await asyncio.sleep(0)
+        await sleep()
         frames.common.draw_frame(canvas, row, column, garbage_frame, negative=True)
         row += speed
+
+
+async def sleep(tics=1):
+    '''Pauses async func for given number of tics.'''
+
+    for _ in range(tics):
+        await asyncio.sleep(0)
