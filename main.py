@@ -42,6 +42,8 @@ def draw(canvas):
     coroutines.append(frames.animation.animate_spaceship(canvas, window_rows, window_columns,
                                                          SPACESHIP_STEP_SIZE))
 
+    coroutines.append(frames.animation.fill_orbit_with_garbage(canvas, window_columns, coroutines))
+
     while True:
         for coroutine in coroutines.copy():
             try:

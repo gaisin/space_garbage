@@ -5,6 +5,7 @@ import curses
 import random
 
 import frames.common
+from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
 from frames.rocket import rocket_frame_1, rocket_frame_2
 
 
@@ -92,7 +93,19 @@ async def fire(canvas, start_row, start_column, rows_speed=-0.3, columns_speed=0
         column += columns_speed
 
 
-async def fly_garbage(canvas, column, garbage_frame, speed=0.5):
+async def fill_orbit_with_garbage(canvas, window_columns, coroutines):
+    '''Endlessly starts animating flying peace of garbage.'''
+
+    while True:
+        random_frame = random.choice([duck, hubble, lamp, trash_small, trash_medium, trash_large])
+        border_size = 1
+        random_column = random.randint(border_size, window_columns-2*border_size)
+        coroutines.append(frames.animation.fly_garbage(canvas, random_column, random_frame))
+        for i in range(20):
+            await sleep()
+
+
+async def fly_garbage(canvas, column, garbage_frame, speed=1):
     '''Animate garbage, flying from top to bottom.
     Сolumn position will stay same, as specified on start.
     '''
