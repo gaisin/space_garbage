@@ -77,19 +77,3 @@ def read_controls(canvas):
             space_pressed = True
     
     return rows_direction, columns_direction, space_pressed
-
-
-def change_frame_position(current_position, direction, step_size, window_size, border_size,
-                          frame_size):
-    '''Changes position of the frame according to args.'''
-
-    if (current_position + direction * step_size - border_size >= 0 and 
-            border_size + current_position + frame_size + direction * step_size <= window_size):
-        new_position = current_position + direction * step_size
-    elif direction < 0:
-        new_position = current_position - (current_position - border_size)
-    elif direction > 0:
-        new_position = (current_position + window_size - border_size - 
-                        (current_position + frame_size))
-
-    return new_position

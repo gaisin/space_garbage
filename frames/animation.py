@@ -5,6 +5,7 @@ import curses
 import random
 
 import frames.common
+from frames.physics import update_speed
 from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
 from frames.rocket import rocket_frame_1, rocket_frame_2
 
@@ -22,6 +23,7 @@ async def animate_spaceship(canvas, window_rows, window_columns, step_size):
     next_frame = rocket_frame_2
 
     iteration = 0
+    row_speed = column_speed = 0
     while True:
         frames.common.draw_frame(canvas, start_row, start_column, current_frame)
 
@@ -31,12 +33,10 @@ async def animate_spaceship(canvas, window_rows, window_columns, step_size):
         frames.common.draw_frame(canvas, start_row, start_column, current_frame, negative=True)
 
         rows_direction, columns_direction, _ = frames.common.read_controls(canvas)
-        if rows_direction:
-            start_row = frames.common.change_frame_position(start_row, rows_direction,
-                step_size, window_rows, border_size, frame_rows)
-        if columns_direction:
-            start_column = frames.common.change_frame_position(start_column, columns_direction,
-                step_size, window_columns, border_size, frame_columns)
+        row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction,
+                                               columns_direction)
+        start_row += row_speed
+        start_column += column_speed
 
         if iteration % flame_animation_speed == 0:
             current_frame, next_frame = next_frame, current_frame
