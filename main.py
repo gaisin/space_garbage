@@ -57,5 +57,5 @@ def draw(canvas):
 
 
 if __name__ == '__main__':
-  curses.update_lines_cols()
-  curses.wrapper(draw)
+    curses.update_lines_cols()
+    curses.wrapper(draw)
