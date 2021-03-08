@@ -96,7 +96,7 @@ async def fill_orbit_with_garbage(canvas, window_columns, coroutines):
         random_frame = random.choice([duck, hubble, lamp, trash_small, trash_medium, trash_large])
         border_size = 1
         random_column = random.randint(border_size, window_columns-2*border_size)
-        coroutines.append(frames.animation.fly_garbage(canvas, random_column, random_frame))
+        coroutines.append(fly_garbage(canvas, random_column, random_frame))
         for i in range(20):
             await sleep()
 
