@@ -4,7 +4,7 @@ import curses
 import random
 import time
 
-import frames.animation
+from frames.animation import AnimationHandler
 
 
 BACKGROUND_STARS_NUM = 200
@@ -28,17 +28,20 @@ def draw(canvas):
     coroutines = []
     window_rows, window_columns = canvas.getmaxyx()  # getmaxyx returns heigh and width of window
     border_size = 1
+
+    animation_handler = AnimationHandler(canvas, coroutines)
+
     for i in range(BACKGROUND_STARS_NUM):
         random_row = random.randint(border_size, window_rows-2*border_size)
         random_column = random.randint(border_size, window_columns-2*border_size)
         random_symbol = random.choice('+*.:')
-        coroutines.append(frames.animation.blink(canvas, random_row, random_column,
-                                                 symbol=random_symbol))
+        coroutines.append(animation_handler.blink(random_row, random_column,
+                                                  symbol=random_symbol))
 
-    coroutines.append(frames.animation.animate_spaceship(canvas, window_rows, window_columns,
-                                                         SPACESHIP_STEP_SIZE, coroutines))
+    coroutines.append(animation_handler.animate_spaceship(window_rows, window_columns,
+                                                          SPACESHIP_STEP_SIZE))
 
-    coroutines.append(frames.animation.fill_orbit_with_garbage(canvas, window_columns, coroutines))
+    coroutines.append(animation_handler.fill_orbit_with_garbage(window_columns))
 
     while True:
         for coroutine in coroutines.copy():
