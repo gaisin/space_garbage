@@ -35,12 +35,8 @@ def draw(canvas):
         coroutines.append(frames.animation.blink(canvas, random_row, random_column,
                                                  symbol=random_symbol))
 
-    central_row = window_rows // 2
-    central_column = window_columns // 2
-    coroutines.append(frames.animation.fire(canvas, central_row, central_column))
-
     coroutines.append(frames.animation.animate_spaceship(canvas, window_rows, window_columns,
-                                                         SPACESHIP_STEP_SIZE))
+                                                         SPACESHIP_STEP_SIZE, coroutines))
 
     coroutines.append(frames.animation.fill_orbit_with_garbage(canvas, window_columns, coroutines))
 

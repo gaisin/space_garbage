@@ -10,7 +10,7 @@ from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_
 from frames.rocket import rocket_frame_1, rocket_frame_2
 
 
-async def animate_spaceship(canvas, window_rows, window_columns, step_size):
+async def animate_spaceship(canvas, window_rows, window_columns, step_size, coroutines):
     '''Displays spaceship animation.'''
 
     frame_rows, frame_columns = frames.common.get_frame_size(rocket_frame_1)
@@ -32,7 +32,12 @@ async def animate_spaceship(canvas, window_rows, window_columns, step_size):
 
         frames.common.draw_frame(canvas, start_row, start_column, current_frame, negative=True)
 
-        rows_direction, columns_direction, _ = frames.common.read_controls(canvas)
+        rows_direction, columns_direction, space_pressed = frames.common.read_controls(canvas)
+
+        if space_pressed:
+            frame_center_column = start_column + frame_columns // 2
+            coroutines.append(fire(canvas, start_row, frame_center_column))
+
         row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction,
                                                columns_direction)
         start_row += row_speed
