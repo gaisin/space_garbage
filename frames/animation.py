@@ -6,7 +6,7 @@ import random
 
 import frames.common
 
-from frames.physics import update_speed
+from frames.obstacles import Obstacle
 from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
 from frames.physics import update_speed
 from frames.rocket import rocket_frame_1, rocket_frame_2
@@ -15,8 +15,7 @@ from frames.rocket import rocket_frame_1, rocket_frame_2
 class AnimationHandler:
 
     def __init__(self, canvas, coroutines):
-async def animate_spaceship(canvas, window_rows, window_columns, step_size, coroutines):
-    '''Displays spaceship animation.'''
+        self.obstacles = []
         self.canvas = canvas
         self.coroutines = coroutines
 
@@ -127,14 +126,12 @@ async def animate_spaceship(canvas, window_rows, window_columns, step_size, coro
         frame_rows, frame_columns = frames.common.get_frame_size(garbage_frame)
 
         while row < rows_number:
-        frames.common.draw_frame(canvas, row, column, garbage_frame)
-        await sleep()
-        frames.common.draw_frame(canvas, row, column, garbage_frame, negative=True)
-        row += speed
-
+            obstacle = Obstacle(row, column, frame_rows, frame_columns)
+            self.obstacles.append(obstacle)
             frames.common.draw_frame(self.canvas, row, column, garbage_frame)
             await self.sleep()
             frames.common.draw_frame(self.canvas, row, column, garbage_frame, negative=True)
+            self.obstacles.remove(obstacle)
             row += speed
 
     async def sleep(self, tics=1):
