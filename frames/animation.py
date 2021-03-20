@@ -12,6 +12,10 @@ from frames.physics import update_speed
 from frames.rocket import rocket_frame_1, rocket_frame_2
 
 
+BULLET_SPEED = -1  # less is faster
+GARBAGE_FALLING_SPEED = 5
+GARBAGE_GENERATION_SPEED = 30
+
 class AnimationHandler:
 
     def __init__(self, canvas, coroutines):
@@ -45,7 +49,7 @@ class AnimationHandler:
 
             if space_pressed:
                 frame_center_column = start_column + frame_columns // 2
-                self.coroutines.append(self.fire(start_row, frame_center_column))
+                self.coroutines.append(self.fire(start_row, frame_center_column, rows_speed=BULLET_SPEED))
 
             row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction,
                                                 columns_direction)
@@ -108,8 +112,7 @@ class AnimationHandler:
             border_size = 1
             random_column = random.randint(border_size, window_columns-2*border_size)
             self.coroutines.append(self.fly_garbage(random_column, random_frame))
-            for i in range(20):
-                await self.sleep()
+            await self.sleep(tics=GARBAGE_GENERATION_SPEED)
 
     async def fly_garbage(self, column, garbage_frame, speed=1):
         '''Animate garbage, flying from top to bottom.
@@ -133,7 +136,7 @@ class AnimationHandler:
             frames.common.draw_frame(self.canvas, row, column, garbage_frame)
             frames.common.draw_frame(self.canvas, obstacle_start_row, obstacle_start_column, obstacle.get_bounding_box_frame())
 
-            await self.sleep()
+            await self.sleep(tics=GARBAGE_FALLING_SPEED)
 
             frames.common.draw_frame(self.canvas, row, column, garbage_frame, negative=True)
             frames.common.draw_frame(self.canvas, obstacle_start_row, obstacle_start_column, obstacle.get_bounding_box_frame(), negative=True)
