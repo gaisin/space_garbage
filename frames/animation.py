@@ -128,9 +128,16 @@ class AnimationHandler:
         while row < rows_number:
             obstacle = Obstacle(row, column, frame_rows, frame_columns)
             self.obstacles.append(obstacle)
+            obstacle_start_row, obstacle_start_column = obstacle.get_bounding_box_corner_pos()
+
             frames.common.draw_frame(self.canvas, row, column, garbage_frame)
+            frames.common.draw_frame(self.canvas, obstacle_start_row, obstacle_start_column, obstacle.get_bounding_box_frame())
+
             await self.sleep()
+
             frames.common.draw_frame(self.canvas, row, column, garbage_frame, negative=True)
+            frames.common.draw_frame(self.canvas, obstacle_start_row, obstacle_start_column, obstacle.get_bounding_box_frame(), negative=True)
+
             self.obstacles.remove(obstacle)
             row += speed
 
