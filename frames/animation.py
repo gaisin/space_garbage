@@ -49,8 +49,8 @@ class AnimationHandler:
 
             row_speed, column_speed = update_speed(row_speed, column_speed, rows_direction,
                                                 columns_direction)
-            start_row += row_speed
-            start_column += column_speed
+            start_row = (start_row + row_speed) % window_rows
+            start_column = (start_column + column_speed) % window_columns
 
             if iteration % flame_animation_speed == 0:
                 current_frame, next_frame = next_frame, current_frame
