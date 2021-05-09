@@ -10,6 +10,7 @@ from frames.obstacles import Obstacle
 from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
 from frames.physics import update_speed
 from frames.rocket import rocket_frame_1, rocket_frame_2
+from frames.explosion import explosion_frames
 
 
 BULLET_SPEED = -1  # less is faster
@@ -151,9 +152,27 @@ class AnimationHandler:
             self.obstacles.remove(obstacle)
 
             if obstacle in self.obstacles_in_last_collisions:
+                shift_for_better_alignment = 2
+                await self.explode(row+frame_rows/2+shift_for_better_alignment,
+                                   column+frame_columns/2-shift_for_better_alignment)
                 break
 
             row += speed
+
+    async def explode(self, center_row, center_column):
+        '''Draws explode animation.'''
+
+        rows, columns = frames.common.get_frame_size(explosion_frames[0])
+        corner_row = center_row - rows / 2
+        corner_column = center_column - columns / 2
+
+        curses.beep()
+
+        for frame in explosion_frames:
+            frames.common.draw_frame(self.canvas, corner_row, corner_column, frame)
+            await self.sleep()
+            frames.common.draw_frame(self.canvas, corner_row, corner_column, frame, negative=True)
+            await self.sleep()
 
     async def sleep(self, tics=1):
         '''Pauses async func for given number of tics.'''
