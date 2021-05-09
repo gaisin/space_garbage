@@ -98,6 +98,11 @@ class AnimationHandler:
         curses.beep()
 
         while 0 < row < max_row and 0 < column < max_column:
+
+            for obstacle in self.obstacles:
+                if obstacle.has_collision(row, column):
+                    return
+
             self.canvas.addstr(round(row), round(column), symbol)
             await self.sleep()
             self.canvas.addstr(round(row), round(column), ' ')
