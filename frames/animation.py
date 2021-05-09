@@ -20,6 +20,7 @@ class AnimationHandler:
 
     def __init__(self, canvas, coroutines):
         self.obstacles = []
+        self.obstacles_in_last_collisions = []
         self.canvas = canvas
         self.coroutines = coroutines
 
@@ -101,6 +102,7 @@ class AnimationHandler:
 
             for obstacle in self.obstacles:
                 if obstacle.has_collision(row, column):
+                    self.obstacles_in_last_collisions.append(obstacle)
                     return
 
             self.canvas.addstr(round(row), round(column), symbol)
@@ -147,6 +149,10 @@ class AnimationHandler:
             frames.common.draw_frame(self.canvas, obstacle_start_row, obstacle_start_column, obstacle.get_bounding_box_frame(), negative=True)
 
             self.obstacles.remove(obstacle)
+
+            if obstacle in self.obstacles_in_last_collisions:
+                break
+
             row += speed
 
     async def sleep(self, tics=1):
