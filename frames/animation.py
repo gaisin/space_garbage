@@ -11,6 +11,7 @@ from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_
 from frames.physics import update_speed
 from frames.rocket import rocket_frame_1, rocket_frame_2
 from frames.explosion import explosion_frames
+from frames.text import game_over
 
 
 BULLET_SPEED = -1  # less is faster
@@ -60,6 +61,12 @@ class AnimationHandler:
 
             if iteration % flame_animation_speed == 0:
                 current_frame, next_frame = next_frame, current_frame
+
+            frame_rows, frame_columns = frames.common.get_frame_size(current_frame)
+            for obstacle in self.obstacles:
+                if obstacle.has_collision(start_row, start_column, frame_rows, frame_columns):
+                    self.coroutines.append(self.show_gameover())
+                    return
 
     async def blink(self, row, column, symbol='*'):
         '''Displays animation of a star.'''
@@ -179,3 +186,17 @@ class AnimationHandler:
 
         for _ in range(tics):
             await asyncio.sleep(0)
+
+    async def show_gameover(self):
+        '''Shows "GameOver" in the middle of the screen.'''
+
+        while True:
+            rows_number, columns_number = self.canvas.getmaxyx()
+            frame_rows, frame_columns = frames.common.get_frame_size(game_over)
+
+            start_row = (rows_number - frame_rows) / 2
+            start_column = (columns_number - frame_columns) / 2
+
+            frames.common.draw_frame(self.canvas, start_row, start_column, game_over)
+
+            await self.sleep()
