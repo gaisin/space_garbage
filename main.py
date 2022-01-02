@@ -9,6 +9,7 @@ from frames.animation import AnimationHandler
 
 BACKGROUND_STARS_NUM = 200
 TICKS_DELAY = 0.1
+TICKS_IN_SECOND = 1 / TICKS_DELAY
 SPACESHIP_STEP_SIZE = 1
 
 
@@ -29,7 +30,7 @@ def draw(canvas):
     window_rows, window_columns = canvas.getmaxyx()  # getmaxyx returns heigh and width of window
     border_size = 1
 
-    animation_handler = AnimationHandler(canvas, coroutines)
+    animation_handler = AnimationHandler(canvas, border_size, coroutines)
 
     for i in range(BACKGROUND_STARS_NUM):
         random_row = random.randint(border_size, window_rows-2*border_size)
@@ -42,6 +43,8 @@ def draw(canvas):
                                                           SPACESHIP_STEP_SIZE))
 
     coroutines.append(animation_handler.fill_orbit_with_garbage(window_columns))
+    coroutines.append(animation_handler.increase_year(TICKS_IN_SECOND))
+    coroutines.append(animation_handler.animate_year(window_rows, window_columns))
 
     while True:
         for coroutine in coroutines.copy():

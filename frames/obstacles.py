@@ -50,7 +50,7 @@ async def show_obstacles(canvas, obstacles):
 
         for obstacle in obstacles:
             boxes.append(obstacle.dump_bounding_box())
-        
+
         for row, column, frame in boxes:
             draw_frame(canvas, row, column, frame)
 

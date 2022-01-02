@@ -11,20 +11,52 @@ from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_
 from frames.physics import update_speed
 from frames.rocket import rocket_frame_1, rocket_frame_2
 from frames.explosion import explosion_frames
-from frames.text import game_over
+from frames.text import game_over, PHRASES
 
 
 BULLET_SPEED = -1  # less is faster
 GARBAGE_FALLING_SPEED = 5
 GARBAGE_GENERATION_SPEED = 30
+SECONDS_PER_YEAR = 1.5
 
 class AnimationHandler:
 
-    def __init__(self, canvas, coroutines):
+    def __init__(self, canvas, border_size, coroutines):
         self.obstacles = []
         self.obstacles_in_last_collisions = []
         self.canvas = canvas
         self.coroutines = coroutines
+        self.year = 1957
+        self.border_size = border_size
+
+    async def increase_year(self, ticks_in_second):
+        '''Increases year inside the game.'''
+
+        while True:
+            self.year += 1
+            await self.sleep(int(ticks_in_second * SECONDS_PER_YEAR))
+
+    async def animate_year(self, window_rows, window_columns):
+        '''Displays year in the corner of the screen.'''
+
+        derwin = self.canvas.derwin(
+            window_rows - self.border_size*3,
+            self.border_size*2,
+        )
+
+        text = f'Year: {self.year}'
+
+        while True:
+            frames.common.draw_frame(derwin, 1, 1, text, negative=True)
+
+            text = f'Year: {self.year}'
+            phrase = PHRASES.get(self.year)
+            if phrase is not None:
+                text += f', {phrase}'
+
+            frames.common.draw_frame(derwin, 1, 1, text)
+
+            await self.sleep(tics=1)
 
     async def animate_spaceship(self, window_rows, window_columns, step_size):
         '''Displays spaceship animation.'''
@@ -33,7 +65,6 @@ class AnimationHandler:
         start_row = (window_rows - frame_rows) // 2
         start_column = (window_columns - frame_columns) // 2
         flame_animation_speed = 2
-        border_size = 1
 
         current_frame = rocket_frame_1
         next_frame = rocket_frame_2
@@ -123,11 +154,14 @@ class AnimationHandler:
         '''Endlessly starts animating flying peace of garbage.'''
 
         while True:
-            random_frame = random.choice([duck, hubble, lamp, trash_small, trash_medium, trash_large])
-            border_size = 1
-            random_column = random.randint(border_size, window_columns-2*border_size)
-            self.coroutines.append(self.fly_garbage(random_column, random_frame))
-            await self.sleep(tics=GARBAGE_GENERATION_SPEED)
+            garbage_delay_ticks = frames.common.get_garbage_delay_tics(self.year)
+            if garbage_delay_ticks is None:
+                await self.sleep(tics=1)
+            else:
+                random_frame = random.choice([duck, hubble, lamp, trash_small, trash_medium, trash_large])
+                random_column = random.randint(self.border_size, window_columns-2*self.border_size)
+                self.coroutines.append(self.fly_garbage(random_column, random_frame))
+                await self.sleep(tics=garbage_delay_ticks)
 
     async def fly_garbage(self, column, garbage_frame, speed=1):
         '''Animate garbage, flying from top to bottom.
