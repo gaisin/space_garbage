@@ -4,14 +4,18 @@ import asyncio
 import curses
 import random
 
-import frames.common
-
-from frames.obstacles import Obstacle
-from frames.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
-from frames.physics import update_speed
-from frames.rocket import rocket_frame_1, rocket_frame_2
-from frames.explosion import explosion_frames
-from frames.text import game_over, PHRASES
+from space_garbage.common import (
+    draw_frame,
+    get_frame_size,
+    get_garbage_delay_tics,
+    read_controls,
+)
+from space_garbage.obstacles import Obstacle
+from space_garbage.garbage import duck, hubble, lamp, trash_small, trash_medium, trash_large
+from space_garbage.physics import update_speed
+from space_garbage.rocket import rocket_frame_1, rocket_frame_2
+from space_garbage.explosion import explosion_frames
+from space_garbage.text import game_over, PHRASES
 
 
 BULLET_SPEED = -1  # less is faster
@@ -48,21 +52,21 @@ class AnimationHandler:
         text = f'Year: {self.year}'
 
         while True:
-            frames.common.draw_frame(derwin, 1, 1, text, negative=True)
+            draw_frame(derwin, 1, 1, text, negative=True)
 
             text = f'Year: {self.year}'
             phrase = PHRASES.get(self.year)
             if phrase is not None:
                 text += f', {phrase}'
 
-            frames.common.draw_frame(derwin, 1, 1, text)
+            draw_frame(derwin, 1, 1, text)
 
             await self.sleep(tics=1)
 
     async def animate_spaceship(self, window_rows, window_columns, step_size):
         '''Displays spaceship animation.'''
 
-        frame_rows, frame_columns = frames.common.get_frame_size(rocket_frame_1)
+        frame_rows, frame_columns = get_frame_size(rocket_frame_1)
         start_row = (window_rows - frame_rows) // 2
         start_column = (window_columns - frame_columns) // 2
         flame_animation_speed = 2
@@ -73,14 +77,14 @@ class AnimationHandler:
         iteration = 0
         row_speed = column_speed = 0
         while True:
-            frames.common.draw_frame(self.canvas, start_row, start_column, current_frame)
+            draw_frame(self.canvas, start_row, start_column, current_frame)
 
             iteration += 1
             await self.sleep()
 
-            frames.common.draw_frame(self.canvas, start_row, start_column, current_frame, negative=True)
+            draw_frame(self.canvas, start_row, start_column, current_frame, negative=True)
 
-            rows_direction, columns_direction, space_pressed = frames.common.read_controls(self.canvas)
+            rows_direction, columns_direction, space_pressed = read_controls(self.canvas)
 
             if space_pressed and self.year >= LASER_APPEARANCE_YEAR:
                 frame_center_column = start_column + frame_columns // 2
@@ -94,7 +98,7 @@ class AnimationHandler:
             if iteration % flame_animation_speed == 0:
                 current_frame, next_frame = next_frame, current_frame
 
-            frame_rows, frame_columns = frames.common.get_frame_size(current_frame)
+            frame_rows, frame_columns = get_frame_size(current_frame)
             for obstacle in self.obstacles:
                 if obstacle.has_collision(start_row, start_column, frame_rows, frame_columns):
                     self.coroutines.append(self.show_gameover())
@@ -155,7 +159,7 @@ class AnimationHandler:
         '''Endlessly starts animating flying peace of garbage.'''
 
         while True:
-            garbage_delay_ticks = frames.common.get_garbage_delay_tics(self.year)
+            garbage_delay_ticks = get_garbage_delay_tics(self.year)
             if garbage_delay_ticks is None:
                 await self.sleep(tics=1)
             else:
@@ -176,17 +180,17 @@ class AnimationHandler:
 
         row = 0
 
-        frame_rows, frame_columns = frames.common.get_frame_size(garbage_frame)
+        frame_rows, frame_columns = get_frame_size(garbage_frame)
 
         while row < rows_number:
             obstacle = Obstacle(row, column, frame_rows, frame_columns)
             self.obstacles.append(obstacle)
 
-            frames.common.draw_frame(self.canvas, row, column, garbage_frame)
+            draw_frame(self.canvas, row, column, garbage_frame)
 
             await self.sleep(tics=GARBAGE_FALLING_SPEED)
 
-            frames.common.draw_frame(self.canvas, row, column, garbage_frame, negative=True)
+            draw_frame(self.canvas, row, column, garbage_frame, negative=True)
 
             self.obstacles.remove(obstacle)
 
@@ -201,16 +205,16 @@ class AnimationHandler:
     async def explode(self, center_row, center_column):
         '''Draws explode animation.'''
 
-        rows, columns = frames.common.get_frame_size(explosion_frames[0])
+        rows, columns = get_frame_size(explosion_frames[0])
         corner_row = center_row - rows / 2
         corner_column = center_column - columns / 2
 
         curses.beep()
 
         for frame in explosion_frames:
-            frames.common.draw_frame(self.canvas, corner_row, corner_column, frame)
+            draw_frame(self.canvas, corner_row, corner_column, frame)
             await self.sleep()
-            frames.common.draw_frame(self.canvas, corner_row, corner_column, frame, negative=True)
+            draw_frame(self.canvas, corner_row, corner_column, frame, negative=True)
             await self.sleep()
 
     async def sleep(self, tics=1):
@@ -224,11 +228,11 @@ class AnimationHandler:
 
         while True:
             rows_number, columns_number = self.canvas.getmaxyx()
-            frame_rows, frame_columns = frames.common.get_frame_size(game_over)
+            frame_rows, frame_columns = get_frame_size(game_over)
 
             start_row = (rows_number - frame_rows) / 2
             start_column = (columns_number - frame_columns) / 2
 
-            frames.common.draw_frame(self.canvas, start_row, start_column, game_over)
+            draw_frame(self.canvas, start_row, start_column, game_over)
 
             await self.sleep()

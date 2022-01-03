@@ -4,7 +4,7 @@ import curses
 import random
 import time
 
-from frames.animation import AnimationHandler
+from space_garbage.animation import AnimationHandler
 
 
 BACKGROUND_STARS_NUM = 200
@@ -59,6 +59,10 @@ def draw(canvas):
         time.sleep(TICKS_DELAY)
 
 
-if __name__ == '__main__':
+def main():
     curses.update_lines_cols()
     curses.wrapper(draw)
+
+
+if __name__ == '__main__':
+    main()

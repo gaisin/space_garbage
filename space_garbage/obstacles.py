@@ -1,6 +1,6 @@
 import asyncio
 
-from frames.common import draw_frame
+from space_garbage.common import draw_frame
 
 
 class Obstacle:
