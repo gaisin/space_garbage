@@ -50,12 +50,12 @@ def draw(canvas):
         for coroutine in coroutines.copy():
             try:
                 coroutine.send(None)
-                canvas.refresh()
-                canvas.border()
             except StopIteration:
                 coroutines.remove(coroutine)
             if not coroutines:
                 break
+        canvas.refresh()
+        canvas.border()
         time.sleep(TICKS_DELAY)
 
 
