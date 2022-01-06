@@ -22,7 +22,6 @@ BULLET_SPEED = -1  # less is faster
 GARBAGE_FALLING_SPEED = 5
 GARBAGE_GENERATION_SPEED = 30
 SECONDS_PER_YEAR = 1.5
-LASER_APPEARANCE_YEAR = 2020
 
 class AnimationHandler:
 
@@ -86,7 +85,7 @@ class AnimationHandler:
 
             rows_direction, columns_direction, space_pressed = read_controls(self.canvas)
 
-            if space_pressed and self.year >= LASER_APPEARANCE_YEAR:
+            if space_pressed:
                 frame_center_column = start_column + frame_columns // 2
                 self.coroutines.append(self.fire(start_row, frame_center_column, rows_speed=BULLET_SPEED))
 
